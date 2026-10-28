@@ -1,0 +1,33 @@
+$ curl -X POST -F title="Persistence test" -F body="Written before restart + reboot" http://localhost:5000/api/notes
+{"body":"Written before restart + reboot","filename":null,"id":1,"title":"Persistence test"}
+
+
+$ sudo systemctl restart cloudnotes
+$ curl http://localhost:5000/api/notes   # after app restart
+[{"body":"Written before restart + reboot","created_at":"Wed, 28 Oct 2026 05:00:50 GMT","filename":null,"id":1,"title":"Persistence test"}]
+
+
+$ uptime -s   # before reboot
+2026-10-28 10:27:45
+$ limactl stop cloudnotes && limactl start cloudnotes   # full VM reboot
+
+$ uptime -s   # after reboot (new boot time)
+2026-10-28 10:30:59
+$ systemctl status cloudnotes   # came back on its own, nobody started it
+● cloudnotes.service - CloudNotes Flask app (gunicorn)
+     Loaded: loaded (/etc/systemd/system/cloudnotes.service; enabled; preset: enabled)
+     Active: active (running) since Wed 2026-10-28 10:31:05 IST; 5s ago
+ Invocation: 765983a379dd4a74a79015a411ed1c62
+   Main PID: 1624 (gunicorn)
+      Tasks: 3 (limit: 2102)
+
+$ curl http://localhost:5000/api/notes   # after VM reboot
+[{"body":"Written before restart + reboot","created_at":"Wed, 28 Oct 2026 05:00:50 GMT","filename":null,"id":1,"title":"Persistence test"}]
+
+
+$ sudo -u postgres psql -d cloudnotes -c "SELECT id, title, created_at FROM notes"
+ id |      title       |            created_at            
+----+------------------+----------------------------------
+  1 | Persistence test | 2026-10-28 10:30:50.424729+05:30
+(1 row)
+

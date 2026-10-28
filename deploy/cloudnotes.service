@@ -1,0 +1,22 @@
+# /etc/systemd/system/cloudnotes.service
+[Unit]
+Description=CloudNotes Flask app (gunicorn)
+After=network-online.target postgresql.service
+Wants=network-online.target
+Requires=postgresql.service
+
+[Service]
+User=cloudnotes
+Group=cloudnotes
+WorkingDirectory=/home/cloudnotes/cloudnotes
+EnvironmentFile=/home/cloudnotes/cloudnotes/.env
+# Bring the schema up to date before every start.
+ExecStartPre=/home/cloudnotes/cloudnotes/venv/bin/python migrate.py
+ExecStart=/home/cloudnotes/cloudnotes/venv/bin/gunicorn --workers 2 --bind 0.0.0.0:5000 --access-logfile - app:app
+# Heal after a crash or kill; wait 2s between attempts.
+Restart=always
+RestartSec=2
+
+[Install]
+# `systemctl enable` hooks the unit into boot.
+WantedBy=multi-user.target
