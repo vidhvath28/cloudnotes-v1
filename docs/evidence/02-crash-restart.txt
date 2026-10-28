@@ -1,0 +1,26 @@
+$ systemctl show -p MainPID -p NRestarts cloudnotes
+MainPID=19909
+NRestarts=0
+
+$ sudo kill -9 19909   # simulate a crash of the gunicorn master
+
+$ systemctl is-active cloudnotes   # ~1s after the kill
+activating
+
+$ systemctl show -p MainPID -p NRestarts cloudnotes   # 5s after the kill
+MainPID=20236
+NRestarts=1
+
+$ journalctl -u cloudnotes --since "-1min" --no-pager | tail
+Oct 28 10:30:36 lima-cloudnotes systemd[1]: cloudnotes.service: Failed with result 'signal'.
+Oct 28 10:30:39 lima-cloudnotes systemd[1]: cloudnotes.service: Scheduled restart job, restart counter is at 1.
+Oct 28 10:30:39 lima-cloudnotes systemd[1]: Starting cloudnotes.service - CloudNotes Flask app (gunicorn)...
+Oct 28 10:30:39 lima-cloudnotes python[20233]: migrations up to date
+Oct 28 10:30:39 lima-cloudnotes systemd[1]: Started cloudnotes.service - CloudNotes Flask app (gunicorn).
+Oct 28 10:30:39 lima-cloudnotes gunicorn[20236]: [2026-10-28 10:30:39 +0530] [20236] [INFO] Listening at: http://0.0.0.0:5000 (20236)
+Oct 28 10:30:39 lima-cloudnotes gunicorn[20237]: [2026-10-28 10:30:39 +0530] [20237] [INFO] Booting worker with pid: 20237
+Oct 28 10:30:39 lima-cloudnotes gunicorn[20238]: [2026-10-28 10:30:39 +0530] [20238] [INFO] Booting worker with pid: 20238
+
+$ curl http://localhost:5000/healthz   # from the Mac
+{"host":"lima-cloudnotes","pid":20238,"status":"ok"}
+

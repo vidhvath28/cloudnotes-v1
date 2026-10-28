@@ -1,0 +1,84 @@
+==> 1/7 Installing system packages
+python3 is already the newest version (3.14.3-0ubuntu2).
+python3 set to manually installed.
+ufw is already the newest version (0.36.2-9build1).
+ufw set to manually installed.
+rsync is already the newest version (3.4.1+ds1-7ubuntu0.3).
+rsync set to manually installed.
+Solving dependencies...
+The following additional packages will be installed:
+Suggested packages:
+Recommended packages:
+The following NEW packages will be installed:
+The following packages will be upgraded:
+5 upgraded, 57 newly installed, 0 to remove and 60 not upgraded.
+Preconfiguring packages ...
+/var/cache/debconf/tmp.ci/postgresql.config.Gu6Ibi: 12: pg_lsclusters: not found
+Adding 'diversion of /usr/bin/pg_config to /usr/bin/pg_config.libpq-dev by postgresql-common'
+Creating config file /etc/postgresql-common/createcluster.conf with new version
+Removing obsolete dictionary files:
+Creating new PostgreSQL cluster 18/main ...
+/usr/lib/postgresql/18/bin/initdb -D /var/lib/postgresql/18/main --auth-local peer --auth-host scram-sha-256 --no-instructions
+The files belonging to this database system will be owned by user "postgres".
+This user must also own the server process.
+
+The database cluster will be initialized with locale "C.UTF-8".
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are enabled.
+
+fixing permissions on existing directory /var/lib/postgresql/18/main ... ok
+creating subdirectories ... ok
+selecting dynamic shared memory implementation ... posix
+selecting default "max_connections" ... 100
+selecting default "shared_buffers" ... 128MB
+selecting default time zone ... Asia/Kolkata
+creating configuration files ... ok
+running bootstrap script ... ok
+performing post-bootstrap initialization ... ok
+syncing data to disk ... ok
+
+Running kernel seems to be up-to-date (ABI upgrades are not detected).
+
+Restarting services...
+ systemctl restart packagekit.service
+
+No containers need to be restarted.
+
+No user sessions are running outdated binaries.
+
+No VM guests are running outdated hypervisor (qemu) binaries on this host.
+==> 2/7 Creating service user 'cloudnotes'
+==> 3/7 Getting the code into /home/cloudnotes/cloudnotes
+==> 4/7 Installing Python dependencies into a venv
+==> 5/7 Configuring PostgreSQL and .env
+Synchronizing state of postgresql.service with SysV service script with /usr/lib/systemd/systemd-sysv-install.
+Executing: /usr/lib/systemd/systemd-sysv-install enable postgresql
+CREATE ROLE
+applied migration 001_create_notes.sql
+migrations up to date
+==> 6/7 Installing and starting the systemd service
+==> 7/7 Opening the firewall
+Rules updated
+Rules updated (v6)
+Rules updated
+Rules updated (v6)
+Firewall is active and enabled on system startup
+Status: active
+Logging: on (low)
+Default: deny (incoming), allow (outgoing), disabled (routed)
+New profiles: skip
+
+To                         Action      From
+--                         ------      ----
+22/tcp (OpenSSH)           ALLOW IN    Anywhere                  
+5000/tcp                   ALLOW IN    Anywhere                  
+22/tcp (OpenSSH (v6))      ALLOW IN    Anywhere (v6)             
+5000/tcp (v6)              ALLOW IN    Anywhere (v6)             
+
+● cloudnotes.service - CloudNotes Flask app (gunicorn)
+ Invocation: 091d19206aef4cfa90e7d99d1cc360be
+{"host":"lima-cloudnotes","pid":19937,"status":"ok"}
+
+CloudNotes is up on port 5000.

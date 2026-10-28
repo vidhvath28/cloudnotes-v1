@@ -1,0 +1,39 @@
+$ systemctl status cloudnotes
+● cloudnotes.service - CloudNotes Flask app (gunicorn)
+     Loaded: loaded (/etc/systemd/system/cloudnotes.service; enabled; preset: enabled)
+     Active: active (running) since Wed 2026-10-28 10:30:10 IST; 16s ago
+ Invocation: 091d19206aef4cfa90e7d99d1cc360be
+    Process: 19906 ExecStartPre=/home/cloudnotes/cloudnotes/venv/bin/python migrate.py (code=exited, status=0/SUCCESS)
+   Main PID: 19909 (gunicorn)
+      Tasks: 3 (limit: 2102)
+     Memory: 62.7M (peak: 63M)
+        CPU: 234ms
+     CGroup: /system.slice/cloudnotes.service
+             ├─19909 /home/cloudnotes/cloudnotes/venv/bin/python3 /home/cloudnotes/cloudnotes/venv/bin/gunicorn --workers 2 --bind 0.0.0.0:5000 --access-logfile - app:app
+             ├─19924 /home/cloudnotes/cloudnotes/venv/bin/python3 /home/cloudnotes/cloudnotes/venv/bin/gunicorn --workers 2 --bind 0.0.0.0:5000 --access-logfile - app:app
+             └─19937 /home/cloudnotes/cloudnotes/venv/bin/python3 /home/cloudnotes/cloudnotes/venv/bin/gunicorn --workers 2 --bind 0.0.0.0:5000 --access-logfile - app:app
+
+
+$ systemctl is-enabled cloudnotes
+enabled
+
+$ sudo ss -ltnp | grep 5000
+LISTEN 0      2048         0.0.0.0:5000       0.0.0.0:*    users:(("gunicorn",pid=19937,fd=5),("gunicorn",pid=19924,fd=5),("gunicorn",pid=19909,fd=5))
+
+$ sudo ufw status
+Status: active
+
+To                         Action      From
+--                         ------      ----
+OpenSSH                    ALLOW       Anywhere                  
+5000/tcp                   ALLOW       Anywhere                  
+OpenSSH (v6)               ALLOW       Anywhere (v6)             
+5000/tcp (v6)              ALLOW       Anywhere (v6)             
+
+
+# from the Mac host (browser path: localhost:5000 -> Lima port forward -> ufw -> VM)
+$ curl http://localhost:5000/healthz
+{"host":"lima-cloudnotes","pid":19937,"status":"ok"}
+
+$ curl -s -o /dev/null -w "%{http_code}" http://localhost:5000/notes
+200

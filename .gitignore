@@ -5,3 +5,7 @@ __pycache__/
 *.pyd
 .DS_Store
 *.swp
+.env
+uploads/*
+!uploads/.gitkeep
+database/*.db
